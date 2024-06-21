@@ -1,0 +1,22 @@
+let
+    function read_unsigned() : int =
+        let
+            var sum := 0
+            var s := ""
+            var charnum := 0
+        in
+            (s := getchar();
+            while s <> "" & s <> "\n" do
+                (
+                charnum := ord(s) - 48;
+                if charnum < 0 | charnum > 10 then (sum := -1; break);
+                sum := sum * 10 + charnum;
+                s := getchar()
+                );
+            sum)
+        end
+    var a : int := read_unsigned()
+in
+    print_int(a*2);
+    print("\n")
+end
