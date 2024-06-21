@@ -91,7 +91,7 @@ using utils::nl;
 %type <Decl *> decl funcDecl varDecl;
 %type <std::vector<Decl *>> decls;
 %type <Expr *> expr stringExpr seqExpr intExpr callExpr opExpr negExpr
-            assignExpr whileExpr forExpr breakExpr letExpr var;
+            assignExpr whileExpr forExpr breakExpr letExpr var IfThenExpr IfThenElseExpr;
 
 %type <std::vector<Expr *>> exprs nonemptyexprs;
 %type <std::vector<Expr *>> arguments nonemptyarguments;
@@ -109,6 +109,8 @@ using utils::nl;
 %left PLUS;
 %left DIVIDE;
 %left TIMES;
+%nonassoc IF THEN;
+%nonassoc ELSE;
 
 // Declare grammar rules and production actions
 
@@ -122,6 +124,8 @@ decl: varDecl { $$ = $1; }
 ;
 
 expr: stringExpr { $$ = $1; }
+   | IfThenExpr { $$ = $1; }
+   | IfThenElseExpr { $$ = $1; }
    | seqExpr { $$ = $1; }
    | intExpr { $$ =$1;}
    | var { $$ = $1; }
@@ -183,6 +187,14 @@ opExpr: expr PLUS expr   { $$ = new BinaryOperator(@2, $1, $3, o_plus); }
                             new IfThenElse(@3, $3, new IntegerLiteral(nl, 1), new IntegerLiteral(nl, 0)),
                             new IntegerLiteral(nl, 0));
       }
+;
+
+IfThenExpr: IF expr THEN expr
+  { $$ = new IfThenElse(@1, $2, $4, new Sequence(@4, std::vector<Expr *>())); }
+;
+
+IfThenElseExpr: IF expr THEN expr ELSE expr
+  { $$ = new IfThenElse(@1, $2, $4, $6); }
 ;
 
 | expr OR expr     {
